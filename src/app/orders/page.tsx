@@ -5,14 +5,13 @@ import {
   Search, 
   Package,
   MapPin,
-  Clock,
   Loader2,
   ChevronDown,
   CheckCircle,
   XCircle,
   Truck
 } from 'lucide-react'
-import { supabase, Order, CompletedOrder, formatDateTime, formatTimestamp, getStatusColor, getPlatformColor } from '@/lib/supabase'
+import { supabase, Order, CompletedOrder, formatDateTime, getStatusColor, getPlatformColor } from '@/lib/supabase'
 
 type CombinedOrder = (Order | CompletedOrder) & { source: 'active' | 'completed' }
 
@@ -37,25 +36,18 @@ export default function OrdersPage() {
 
   async function fetchOrders() {
     try {
-      // Fetch active orders
-      const { data: activeOrders, error: activeError } = await supabase
+      const { data: activeOrders } = await supabase
         .from('orders')
         .select('*')
         .order('created_at', { ascending: false })
 
-      if (activeError) throw activeError
-
-      // Fetch completed orders
-      const { data: completedOrders, error: completedError } = await supabase
+      const { data: completedOrders } = await supabase
         .from('completed_orders')
         .select('*')
         .order('created_at', { ascending: false })
 
-      if (completedError) throw completedError
-
-      // Combine and tag orders
-      const active = (activeOrders || []).map(o => ({ ...o, source: 'active' as const }))
-      const completed = (completedOrders || []).map(o => ({ ...o, source: 'completed' as const }))
+      const active = (activeOrders || []).map((o: any) => ({ ...o, source: 'active' as const }))
+      const completed = (completedOrders || []).map((o: any) => ({ ...o, source: 'completed' as const }))
       
       const allOrders = [...active, ...completed].sort((a, b) => 
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
@@ -72,7 +64,6 @@ export default function OrdersPage() {
   function filterOrders() {
     let filtered = [...orders]
 
-    // Search filter
     if (search) {
       filtered = filtered.filter(order => 
         order.restaurant_name?.toLowerCase().includes(search.toLowerCase()) ||
@@ -81,19 +72,16 @@ export default function OrdersPage() {
       )
     }
 
-    // Status filter
     if (statusFilter !== 'all') {
       filtered = filtered.filter(order => order.status === statusFilter)
     }
 
-    // Platform filter
     if (platformFilter !== 'all') {
       filtered = filtered.filter(order => 
         order.platform?.toLowerCase() === platformFilter.toLowerCase()
       )
     }
 
-    // Source filter
     if (sourceFilter !== 'all') {
       filtered = filtered.filter(order => order.source === sourceFilter)
     }
@@ -124,15 +112,12 @@ export default function OrdersPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-white">Orders</h1>
         <p className="text-gray-500 mt-1">{orders.length} total orders</p>
       </div>
 
-      {/* Filters */}
       <div className="flex flex-wrap gap-4">
-        {/* Search */}
         <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
           <input
@@ -144,7 +129,6 @@ export default function OrdersPage() {
           />
         </div>
 
-        {/* Source Filter */}
         <div className="relative">
           <select
             value={sourceFilter}
@@ -158,7 +142,6 @@ export default function OrdersPage() {
           <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 pointer-events-none" />
         </div>
 
-        {/* Status Filter */}
         <div className="relative">
           <select
             value={statusFilter}
@@ -175,7 +158,6 @@ export default function OrdersPage() {
           <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 pointer-events-none" />
         </div>
 
-        {/* Platform Filter */}
         <div className="relative">
           <select
             value={platformFilter}
@@ -191,7 +173,6 @@ export default function OrdersPage() {
         </div>
       </div>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         <div className="bg-dark-700 rounded-lg p-4 border border-dark-500">
           <p className="text-gray-500 text-sm">Total</p>
@@ -223,7 +204,6 @@ export default function OrdersPage() {
         </div>
       </div>
 
-      {/* Orders Table */}
       <div className="card overflow-hidden p-0">
         <div className="overflow-x-auto">
           <table className="data-table">

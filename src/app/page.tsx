@@ -52,49 +52,41 @@ export default function Dashboard() {
 
   async function fetchDashboardData() {
     try {
-      // Fetch users stats
-      const { data: users, error: usersError } = await supabase
+      const { data: users } = await supabase
         .from('users')
         .select('*')
 
-      if (usersError) throw usersError
-
-      // Fetch orders stats
-      const { data: orders, error: ordersError } = await supabase
+      const { data: orders } = await supabase
         .from('orders')
         .select('*')
 
-      // Fetch completed orders
-      const { data: completed, error: completedError } = await supabase
+      const { data: completed } = await supabase
         .from('completed_orders')
         .select('*')
 
-      // Calculate stats
       const today = new Date()
       today.setHours(0, 0, 0, 0)
 
       const stats: Stats = {
         totalUsers: users?.length || 0,
-        activeTrials: users?.filter(u => u.subscription_status === 'trial').length || 0,
-        paidSubscribers: users?.filter(u => u.subscription_status === 'active').length || 0,
-        expiredUsers: users?.filter(u => u.subscription_status === 'expired' || u.subscription_status === 'cancelled').length || 0,
+        activeTrials: users?.filter((u: any) => u.subscription_status === 'trial').length || 0,
+        paidSubscribers: users?.filter((u: any) => u.subscription_status === 'active').length || 0,
+        expiredUsers: users?.filter((u: any) => u.subscription_status === 'expired' || u.subscription_status === 'cancelled').length || 0,
         totalOrders: (orders?.length || 0) + (completed?.length || 0),
         completedOrders: completed?.length || 0,
-        activeOrders: orders?.filter(o => o.status !== 'DELIVERED' && o.status !== 'CANCELLED').length || 0,
-        todayOrders: orders?.filter(o => new Date(o.created_at) >= today).length || 0,
+        activeOrders: orders?.filter((o: any) => o.status !== 'DELIVERED' && o.status !== 'CANCELLED').length || 0,
+        todayOrders: orders?.filter((o: any) => new Date(o.created_at) >= today).length || 0,
       }
 
       setStats(stats)
 
-      // Get recent users (last 5)
-      const sortedUsers = users?.sort((a, b) => 
+      const sortedUsers = users?.sort((a: any, b: any) => 
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       ).slice(0, 5) || []
       setRecentUsers(sortedUsers)
 
-      // Get recent orders (last 5)
       const allOrders = [...(orders || []), ...(completed || [])]
-      const sortedOrders = allOrders.sort((a, b) => 
+      const sortedOrders = allOrders.sort((a: any, b: any) => 
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       ).slice(0, 5)
       setRecentOrders(sortedOrders)
@@ -116,15 +108,12 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-white">Dashboard</h1>
         <p className="text-gray-500 mt-1">Welcome back! Here's what's happening with StackAdvisor.</p>
       </div>
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Total Users */}
         <div className="card animate-fade-in">
           <div className="flex items-center justify-between">
             <div>
@@ -141,7 +130,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Active Subscribers */}
         <div className="card animate-fade-in animate-delay-1">
           <div className="flex items-center justify-between">
             <div>
@@ -158,7 +146,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Total Orders */}
         <div className="card animate-fade-in animate-delay-2">
           <div className="flex items-center justify-between">
             <div>
@@ -175,7 +162,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Today's Orders */}
         <div className="card animate-fade-in animate-delay-3">
           <div className="flex items-center justify-between">
             <div>
@@ -192,9 +178,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Users */}
         <div className="card">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold text-white">Recent Users</h2>
@@ -232,7 +216,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Recent Orders */}
         <div className="card">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold text-white">Recent Orders</h2>

@@ -1,17 +1,9 @@
 import { createClient } from '@supabase/supabase-js'
 
-// ═══════════════════════════════════════════════════════════════
-// SUPABASE CLIENT - Connects to your existing database
-// ═══════════════════════════════════════════════════════════════
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 
 export const supabase = createClient(supabaseUrl, supabaseKey)
-
-// ═══════════════════════════════════════════════════════════════
-// TYPE DEFINITIONS - Match your Android app models
-// ═══════════════════════════════════════════════════════════════
 
 export interface User {
   id: string
@@ -75,8 +67,8 @@ export interface Announcement {
   title: string
   message: string
   type: 'info' | 'warning' | 'update' | 'promo'
-  target_region: string | null  // null = all regions
-  target_country: string | null // null = all countries
+  target_region: string | null
+  target_country: string | null
   is_active: boolean
   starts_at: string
   ends_at: string | null
@@ -99,10 +91,6 @@ export interface BannedUser {
   banned_at: string
   banned_by: string
 }
-
-// ═══════════════════════════════════════════════════════════════
-// HELPER FUNCTIONS
-// ═══════════════════════════════════════════════════════════════
 
 export function formatDate(dateString: string | null): string {
   if (!dateString) return 'N/A'
